@@ -1,0 +1,26 @@
+package:
+  name: crawlab_toolbox
+  version: "0.1.0"
+
+source:
+  git_rev: v0.1.0
+  git_url: https://github.com/danielnewman09/crawlab_plots.git
+
+requirements:
+  host:
+    - python
+    - setuptools
+    - numpy
+    - matplotlib
+
+  run:
+    - python
+
+test:
+  imports:
+    - crawlab_plots
+
+about:
+  home: https://github.com/danielnewman09/crawlab_plots
+  license: GNU GPL v3.0
+  license_file: LICENSE
