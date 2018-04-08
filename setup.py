@@ -61,7 +61,7 @@ if __name__ == '__main__':
             url=URL,
             download_url=DOWNLOAD_URL,
             license=LICENSE,
-            cmdclass=cmdclass,
+            #cmdclass=cmdclass,
             classifiers=CLASSIFIERS,
             platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
             test_suite='nose.collector',
