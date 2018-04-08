@@ -1,9 +1,9 @@
 package:
   name: crawlab_toolbox
-  version: "0.1.12"
+  version: "0.1.13"
 
 source:
-  git_rev: v0.1.12
+  git_rev: v0.1.13
   git_url: https://github.com/danielnewman09/crawlab_toolbox.git
 
 requirements:
