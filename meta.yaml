@@ -12,6 +12,7 @@ requirements:
     - setuptools
     - numpy
     - matplotlib
+    - scipy
 
   run:
     - python
