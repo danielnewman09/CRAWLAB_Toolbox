@@ -48,6 +48,8 @@ def configuration(parent_package='',top_path=None):
     return config
 '''
 
+INSTALL_REQUIRES = ['matplotlib','numpy','scipy']
+
 if __name__ == '__main__':
     from numpy.distutils.core import setup
     #setup(**configuration(top_path='').todict())
@@ -63,10 +65,9 @@ if __name__ == '__main__':
             license=LICENSE,
             #cmdclass=cmdclass,
             classifiers=CLASSIFIERS,
-            platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
-            test_suite='nose.collector',
-            #setup_requires=build_requires,
-            #install_requires=build_requires,
-            python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+            platforms=PLATFORMS,
+            #setup_requires=INSTALL_REQUIRES,
+            install_requires=INSTALL_REQUIRES,
+            #python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     )
     setup(**metadata)
