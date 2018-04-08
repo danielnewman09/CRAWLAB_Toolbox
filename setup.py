@@ -10,8 +10,8 @@ FULLNAME = NAME
 AUTHOR = "Daniel Newman"
 AUTHOR_EMAIL = 'danielnewman09@gmail.com'
 LICENSE = "GNU GPLv3.0"
-URL = "https://github.com/danielnewman09/crawlab_toolbox"
-DOWNLOAD_URL = "https://github.com/danielnewman09/crawlab_toolbox/releases"
+URL = "https://github.com/danielnewman09/crawlab-toolbox"
+DOWNLOAD_URL = "https://github.com/danielnewman09/crawlab-toolbox/releases"
 DESCRIPTION = "This package contains the functions necessary to create presentation-ready CRAWLAB plots"
 KEYWORDS = 'CRAWLAB'
 LONG_DESCRIPTION = DESCRIPTION
@@ -28,12 +28,12 @@ CLASSIFIERS = [
     "Intended Audience :: Education",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries",
-    "Programming Language :: Python :: 3.5",
+    #"Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "License :: OSI Approved :: {}".format(LICENSE),
 ]
 PLATFORMS = "Any"
-INSTALL_REQUIRES = ['matplotlib','numpy>=1.8.2']
+INSTALL_REQUIRES = ['matplotlib','numpy','scipy']
 
 import sys
 
