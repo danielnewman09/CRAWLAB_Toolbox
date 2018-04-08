@@ -1,10 +1,10 @@
 package:
   name: crawlab_toolbox
-  version: "0.1.11"
+  version: "0.1.12"
 
 source:
-  git_rev: v0.1.11
-  git_url: https://github.com/danielnewman09/crawlab-toolbox.git
+  git_rev: v0.1.12
+  git_url: https://github.com/danielnewman09/crawlab_toolbox.git
 
 requirements:
   host:
@@ -21,6 +21,6 @@ test:
   imports:
 
 about:
-  home: https://github.com/danielnewman09/crawlab-toolbox
+  home: https://github.com/danielnewman09/crawlab_toolbox
   license: GNU GPL v3.0
   license_file: LICENSE

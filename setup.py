@@ -1,7 +1,7 @@
 """
 Build and install the package.
 """
-from __future__ import division, print_function, absolute_import
+#from __future__ import division, print_function, absolute_import
 
 from setuptools import setup, find_packages
 
@@ -19,6 +19,7 @@ LONG_DESCRIPTION = DESCRIPTION
 VERSION = '0.0.1'
 
 PACKAGES = find_packages()
+
 SCRIPTS = []
 
 CLASSIFIERS = [
@@ -64,6 +65,7 @@ if __name__ == '__main__':
             #cmdclass=cmdclass,
             classifiers=CLASSIFIERS,
             platforms=PLATFORMS,
+            packages=['plotting','utilities','inputshaping','ic_inputshaping','si_shaping']
             #setup_requires=INSTALL_REQUIRES,
             install_requires=INSTALL_REQUIRES,
             #python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
