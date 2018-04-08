@@ -65,7 +65,7 @@ if __name__ == '__main__':
             #cmdclass=cmdclass,
             classifiers=CLASSIFIERS,
             platforms=PLATFORMS,
-            packages=['plotting','utilities','inputshaping','ic_inputshaping','si_shaping']
+            packages=PACKAGES,
             #setup_requires=INSTALL_REQUIRES,
             install_requires=INSTALL_REQUIRES,
             #python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
