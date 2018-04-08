@@ -5,12 +5,12 @@ from __future__ import division, print_function, absolute_import
 
 from setuptools import setup, find_packages
 
-NAME = 'crawlab_plots'
+NAME = 'crawlab_toolbox'
 FULLNAME = NAME
 AUTHOR = "Daniel Newman"
 AUTHOR_EMAIL = 'danielnewman09@gmail.com'
 LICENSE = "GNU GPLv3.0"
-URL = "https://github.com/danielnewman09/crawlab_plots"
+URL = "https://github.com/danielnewman09/crawlab_toolbox"
 DOWNLOAD_URL = "https://github.com/danielnewman09/crawlab_toolbox/releases"
 DESCRIPTION = "This package contains the functions necessary to create presentation-ready CRAWLAB plots"
 KEYWORDS = 'CRAWLAB'
