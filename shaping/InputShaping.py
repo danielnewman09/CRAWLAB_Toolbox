@@ -53,7 +53,7 @@ np.set_printoptions(suppress=True, formatter={'float': '{: 0.4f}'.format})
 # Define a few constants
 HZ_TO_RADS = 2.0 * np.pi
 
-from crawlab_toolbox.utilities import digseq, seqconv, sensplot
+#from crawlab_toolbox.utilities import digseq, seqconv, sensplot
 
 
 class Shaper(object):
