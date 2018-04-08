@@ -37,7 +37,7 @@ INSTALL_REQUIRES = ['matplotlib','numpy>=1.8.2']
 
 import sys
 
-
+'''
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('crawlab-toolbox',parent_package,top_path)
@@ -46,11 +46,11 @@ def configuration(parent_package='',top_path=None):
     config.add_subpackage('inputshaping')
     config.make_config_py()
     return config
-
+'''
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(**configuration(top_path='').todict())
+    #setup(**configuration(top_path='').todict())
 
     metadata = dict(
             name=NAME,
@@ -69,4 +69,4 @@ if __name__ == '__main__':
             install_requires=build_requires,
             python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     )
-    #setup(**metadata)
+    setup(**metadata)

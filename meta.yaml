@@ -4,7 +4,7 @@ package:
 
 source:
   git_rev: v0.1.0
-  git_url: https://github.com/danielnewman09/crawlab_plots.git
+  git_url: https://github.com/danielnewman09/crawlab-toolbox.git
 
 requirements:
   host:
@@ -21,6 +21,6 @@ test:
     - crawlab_plots
 
 about:
-  home: https://github.com/danielnewman09/crawlab_plots
+  home: https://github.com/danielnewman09/crawlab-toolbox
   license: GNU GPL v3.0
   license_file: LICENSE
