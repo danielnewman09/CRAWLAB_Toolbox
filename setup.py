@@ -60,6 +60,10 @@ if __name__ == '__main__':
             description=DESCRIPTION,
             long_description=LONG_DESCRIPTION,
             url=URL,
+            package_data={
+                # If any package contains *.txt files, include them:
+                '': ['*.txt'],
+            },
             download_url=DOWNLOAD_URL,
             license=LICENSE,
             #cmdclass=cmdclass,
