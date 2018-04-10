@@ -1,3 +1,6 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
 
 #----- Utility Functions ------------------------------------------------------
 def digseq(seq,step):
@@ -493,9 +496,6 @@ def CRAWLAB_fft(data, time, freq_max):
     '''
     
     from scipy.fftpack import fft
-    
-    if not os.path.exists(folder):
-        os.makedirs(folder) 
 
     # correct for any DC offset
     offset = np.mean(data) 
