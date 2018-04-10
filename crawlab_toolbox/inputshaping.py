@@ -47,6 +47,8 @@ from scipy.interpolate import griddata
 
 from abc import ABCMeta, abstractmethod
 
+from crawlab_toolbox.utilities import digseq,sensplot,seqconv
+
 # Let's also improve the printing of NumPy arrays.
 np.set_printoptions(suppress=True, formatter={'float': '{: 0.4f}'.format})
 
