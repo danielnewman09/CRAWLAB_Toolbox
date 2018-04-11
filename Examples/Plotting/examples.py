@@ -14,8 +14,10 @@
 import numpy as np
 
 # Import the crawlab_plots functions
-from crawlab_toolbox.plotting import generate_plot
-from crawlab_toolbox.plotting import plot_3d
+#from crawlab_toolbox.plotting import generate_plot
+#from crawlab_toolbox.plotting import plot_3d
+
+import plotting
 
 # Specify the folder where we will save the pdfs of the plots
 folder = 'Figures/'
@@ -39,7 +41,7 @@ responses = np.vstack((response_1(TIME),response_2(TIME),response_3(TIME)))
 labels = ['First', 'Second', 'Third']
 
 # Create a 2D plot
-generate_plot(TIME, 	# X - coordinate on the plot
+plotting.generate_plot(TIME, 	# X - coordinate on the plot
 			  responses,	# Y - coordinates on the plot
 			  labels,	# Labels for the plot legend
 			  'Time (s)',	# X - axis label
@@ -49,7 +51,8 @@ generate_plot(TIME, 	# X - coordinate on the plot
 			  num_col=2,	# Specify the number of columns in the legend
 			  legend_loc='upper right',	# Specify the location of the legend
 			  ymax=0.5,
-			  transparent=True
+			  transparent=True,
+			  save_plot=True
 			 )
 
 # load and parse some pre-generated 3-Dimensional data
@@ -59,13 +62,15 @@ phase = data[:,1]
 amp = data[:,2]
 
 # Create a 3D plot
-plot_3d(freq,phase,amp,
+plotting.plot_3d(freq,phase,amp,
 		r'$\frac{\omega_n}{\omega_m}$',
 		r'$\theta_e$',
 		r'Percent Vibration',
 		folder=folder,
 		filename='SIIC_Phase_Freq_Sens',
 		elevation=40,
+		azimuth=250,
 		xticks=0.1,yticks=30,zticks=20,
 		labelsize=30,labelpad=30,
-		transparent=True)
+		transparent=False,
+		save_plot=True)
