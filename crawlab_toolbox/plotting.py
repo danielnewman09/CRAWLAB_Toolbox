@@ -41,6 +41,7 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 
 # FONT
 mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
 mpl.rcParams['font.serif'] = 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
 
@@ -54,7 +55,7 @@ mpl.rcParams['text.latex.preview'] = True
 
 # AXES
 mpl.rcParams['axes.labelsize'] = 18  # fontsize of the x any y labels
-mpl.rcParams['axes.labelweight'] = 'bold'  # weight of the x and y labels
+mpl.rcParams['axes.labelweight'] = 'medium'  # weight of the x and y labels
 mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'])
                       ## color cycle for plot lines  as list of string
                       ## colorspecs: single letter, long name, or web-style hex
@@ -102,9 +103,10 @@ def generate_plot(
                 xmax = None,
                 xmin = None,
                 tick_increment = None,
-                showplot = True,
+                showplot = False,
                 save_plot = False,
                 log_y = False,
+                log_x = False,
                 transparent = False,
                 grid = False, 
                 folder = None,
@@ -112,7 +114,8 @@ def generate_plot(
                 num_col = 2,
                 legend_loc = 'upper right',
                 experimental_args = None,
-                xlabelpad = 5,            
+                xlabelpad = 5,       
+                hide_origin = False,     
                  ):    
     '''
     This is a function which accepts a series of data and plots it based on preset defaults
@@ -150,7 +153,7 @@ def generate_plot(
 
     # Customize the axes
     ax = plt.gca()
-
+    
     # Make sure the Y data is at least 2-D
     Y = np.atleast_2d(Y)
     
@@ -166,7 +169,7 @@ def generate_plot(
 
     if Y.shape[1] != len(labels):
         raise ValueError('Please ensure the number of legend labels matches the number of data plots.')
-
+    
     if plot_type.lower() == 'plot':
         # Plot all of the available data
         for i in np.arange(0,len(labels)):
@@ -189,6 +192,8 @@ def generate_plot(
         if tick_increment is not None:
             loc = mtick.MultipleLocator(base=tick_increment) # this locator puts ticks at regular intervals
             ax.yaxis.set_major_locator(loc)
+        
+        set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x)
 
         # Show the grid, if desired
         ax.grid(grid)
@@ -221,8 +226,11 @@ def generate_plot(
                 plt.scatter(X[:,i], Y[:,i],
                     label= '{}'.format(labels[i]),s=marker_weight[i],#facecolors='none',#edgecolors='k',
                     marker=plot_markerstyle[i], # Linestyle given from array at the beginning of this document
-                    linewidth=2)      
-     
+                    linewidth=2) 
+                
+        set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x)
+        plt.margins(1)
+        
         #ax.spines['left'].set_color('none')
         ax.spines['top'].set_color('none')
         ax.xaxis.set_ticks_position('bottom')
@@ -242,35 +250,30 @@ def generate_plot(
         # turn off the top spine/ticks
         ax.spines['top'].set_color('none')
         ax.xaxis.tick_bottom()
-
-        xticks = ax.xaxis.get_major_ticks() 
-        yticks = ax.yaxis.get_major_ticks() 
-        xticks[4].label1.set_visible(False)
-        plt.margins(1)
-
+        
     else:
         raise ValueError('Invalid plot_type value. Please provide a valid plot type')
 
-    # Determine the lower and upper bounds of the horizontal axis
-    if xmax == None:
-        xmax = np.amax(X)
-    if xmin == None:
-        xmin = np.amin(X)
+    # X tick locations
+    xloc = mtick.MaxNLocator(
+                    nbins=7, # Maximum number of bins
+                    steps = [0.25, .5 ,1 , 2, 2.5, 5, 10], # valid step increments
+                    prune='both').tick_values(*plt.xlim()) 
 
-    # Set the limits of the plot
-    plt.xlim(xmin, xmax)
+    # Y tick locations
+    yloc = mtick.MaxNLocator(
+                    nbins=6, # Maximum number of bins
+                    steps = [0.25,.5,1, 2, 2.5, 5, 10], # valid step increments
+                    prune='both').tick_values(*plt.ylim())
 
-    if not isinstance(ymax,np.ndarray):
-        # Set the window limits
-        plt.ylim(np.amin(Y) - ymin * abs(np.amin(Y)),
-                 np.amax(Y) + ymax * abs(np.amax(Y)-np.amin(Y)))
-    else:
-        plt.ylim(ymin[0],ymax[0])
+    if hide_origin:
+        # Hide the origin
+        yloc = yloc[np.argwhere(yloc != 0.)]
+        xloc = xloc[np.argwhere(xloc != 0.)]
 
-    # Display the y-axis as a logarithmic scale
-    if log_y == True:
-        ax.set_yscale('log')
-        plt.ylim(np.amin(Y),np.amax(Y))
+    # Set the tickmarks at the given x and y locations
+    ax.set_xticks(xloc)
+    ax.set_yticks(yloc)
 
     # Show the legend
     ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
@@ -408,12 +411,12 @@ def plot_3d(
     X, Y = np.meshgrid(xi, yi)
 
     if np.any(np.isnan(Z)):
+        ax1.scatter(X, Y, Z) 
+        plt.show()
         raise ValueError('The requested values cannot be shown as a smooth surface. \n'
                          'Please double-check your data. Generating point cloud of \n '
                          'requested values...')
-        ax1.scatter(X, Y, Z) 
 
-        showplot = True
 
     else:
         # Plot the surface data
