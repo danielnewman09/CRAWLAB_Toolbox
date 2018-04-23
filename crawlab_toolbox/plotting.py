@@ -94,6 +94,35 @@ plot_linestyle = ['-','--','-.',':']
 marker_weight = [30,60,40,40]
 plot_markerstyle = ['o','x','v','^']
 
+def set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x):
+    
+    if xmax == 0.:
+        xmax += 0.3
+
+    # Determine the lower and upper bounds of the horizontal axis
+    if xmax == None:
+        xmax = np.amax(X)
+    if xmin == None:
+        xmin = np.amin(X)
+
+    # Set the limits of the plot
+    plt.xlim(xmin, xmax)
+
+    if not isinstance(ymax,np.ndarray):
+        # Set the window limits
+        plt.ylim(np.amin(Y) - ymin * abs(np.amin(Y)),
+                 np.amax(Y) + ymax * abs(np.amax(Y)-np.amin(Y)))
+    else:
+        plt.ylim(ymin[0],ymax[0])
+
+    # Display the y-axis as a logarithmic scale
+    if log_y:
+        ax.set_yscale('log')
+        plt.ylim(np.amin(Y),np.amax(Y))
+    if log_x:
+        ax.set_xscale('log')
+        plt.xlim(xmin, xmax)
+
 # Container for all plots
 def generate_plot(
                 X,Y,labels,xlabel,ylabel,
@@ -258,13 +287,13 @@ def generate_plot(
     xloc = mtick.MaxNLocator(
                     nbins=7, # Maximum number of bins
                     steps = [0.25, .5 ,1 , 2, 2.5, 5, 10], # valid step increments
-                    prune='both').tick_values(*plt.xlim()) 
+                    prune='upper').tick_values(*plt.xlim()) 
 
     # Y tick locations
     yloc = mtick.MaxNLocator(
                     nbins=6, # Maximum number of bins
                     steps = [0.25,.5,1, 2, 2.5, 5, 10], # valid step increments
-                    prune='both').tick_values(*plt.ylim())
+                    prune='upper').tick_values(*plt.ylim())
 
     if hide_origin:
         # Hide the origin
