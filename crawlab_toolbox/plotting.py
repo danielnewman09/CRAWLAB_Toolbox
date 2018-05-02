@@ -33,7 +33,7 @@ from scipy.interpolate import griddata
 from cycler import cycler
 
 ### MATPLOTLIBRC FORMAT
-mpl.rcParams['backend'] = 'MacOSX'
+#mpl.rcParams['backend'] = 'MacOSX'
 
 # LINES
 mpl.rcParams['lines.linewidth'] = 2.0     # line width in points
@@ -86,7 +86,7 @@ mpl.rcParams['figure.subplot.hspace'] = 0.2    # the amount of height reserved f
 
 # SAVEFIG
 mpl.rcParams['savefig.dpi'] = 600      # figure dots per inch
-mpl.rcParams['savefig.format'] = 'pdf'      # png, ps, pdf, svg
+mpl.rcParams['savefig.format'] = 'svg'      # png, ps, pdf, svg
 
 # To generically create multiple plots
 plot_linestyle = ['-','--','-.',':']
@@ -144,7 +144,8 @@ def generate_plot(
                 legend_loc = 'upper right',
                 experimental_args = None,
                 xlabelpad = 5,       
-                hide_origin = False,     
+                hide_origin = False,  
+                for_notebook=False   
                  ):    
     '''
     This is a function which accepts a series of data and plots it based on preset defaults
@@ -177,8 +178,11 @@ def generate_plot(
         experimental_args - experimental values to show on the plot
         xlabelpad - spacing between the x-axis and the x-label
     '''
-
-    plt.figure()
+    
+    if for_notebook:
+        plt.figure(figsize=(10,6.67))
+    else:
+        plt.figure()
 
     # Customize the axes
     ax = plt.gca()
@@ -327,7 +331,7 @@ def generate_plot(
             plt.savefig('{}.png'\
                     .format(filename),transparent=transparent)             
         else:
-            plt.savefig('{}.pdf'\
+            plt.savefig('{}.svg'\
                     .format(filename))     
 
     if showplot:

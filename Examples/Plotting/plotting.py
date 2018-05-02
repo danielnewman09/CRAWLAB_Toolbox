@@ -34,6 +34,8 @@ from cycler import cycler
 
 ### MATPLOTLIBRC FORMAT
 mpl.rcParams['backend'] = 'MacOSX'
+#mpl.rcParams['backend'] = 'PDF'
+
 
 # LINES
 mpl.rcParams['lines.linewidth'] = 2.0     # line width in points
