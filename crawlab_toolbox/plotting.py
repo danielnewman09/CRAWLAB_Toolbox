@@ -290,14 +290,14 @@ def generate_plot(
     # X tick locations
     xloc = mtick.MaxNLocator(
                     nbins=7, # Maximum number of bins
-                    steps = [0.25, .5 ,1 , 2, 2.5, 5, 10], # valid step increments
-                    prune='upper').tick_values(*plt.xlim()) 
+                    steps = [0.25, 0.1, .5 ,1 , 2, 2.5, 5, 10], # valid step increments
+                    prune='both').tick_values(*plt.xlim()) 
 
     # Y tick locations
     yloc = mtick.MaxNLocator(
                     nbins=6, # Maximum number of bins
-                    steps = [0.25,.5,1, 2, 2.5, 5, 10], # valid step increments
-                    prune='upper').tick_values(*plt.ylim())
+                    steps = [0.25,0.1, .5, 1, 2, 2.5, 5, 10], # valid step increments
+                    prune='both').tick_values(*plt.ylim())
 
     if hide_origin:
         # Hide the origin

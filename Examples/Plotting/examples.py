@@ -17,7 +17,7 @@ import numpy as np
 #from crawlab_toolbox.plotting import generate_plot
 #from crawlab_toolbox.plotting import plot_3d
 
-import plotting
+from crawlab_toolbox import plotting
 
 # Specify the folder where we will save the pdfs of the plots
 folder = 'Figures/'
@@ -69,7 +69,7 @@ plotting.plot_3d(freq,phase,amp,
 		folder=folder,
 		filename='SIIC_Phase_Freq_Sens',
 		elevation=40,
-		azimuth=250,
+		azimuth=225,
 		xticks=0.1,yticks=30,zticks=20,
 		labelsize=30,labelpad=30,
 		transparent=False,
