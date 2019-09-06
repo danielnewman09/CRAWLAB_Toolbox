@@ -94,7 +94,7 @@ plot_linestyle = ['-','--','-.',':']
 marker_weight = [30,60,40,40]
 plot_markerstyle = ['o','x','v','^']
 
-def set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x):
+def set_lims(ax,X,Y,xmin,xmax,ymin,ymax):
     
     if xmax == 0.:
         xmax += 0.3
@@ -114,14 +114,6 @@ def set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x):
                  np.amax(Y) + ymax * abs(np.amax(Y)-np.amin(Y)))
     else:
         plt.ylim(ymin[0],ymax[0])
-
-    # Display the y-axis as a logarithmic scale
-    if log_y:
-        ax.set_yscale('log')
-        plt.ylim(np.amin(Y),np.amax(Y))
-    if log_x:
-        ax.set_xscale('log')
-        plt.xlim(xmin, xmax)
 
 # Container for all plots
 def generate_plot(
@@ -184,7 +176,7 @@ def generate_plot(
     if template.lower() == 'large':
         plt.figure(figsize=(10,6.67))
     elif template.lower() == 'wide':
-        plt.figure(figsize=(8,4))
+        plt.figure(figsize=(12,4))
     else:
         plt.figure()
 
@@ -216,21 +208,30 @@ def generate_plot(
                 linestyle=plot_linestyle[1], # Linestyle given from array at the beginning of this document
                 linewidth=1)
             else:
-                plt.plot(X, Y[:,i],
-                    label= '{}'.format(labels[i]),
-                    linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
-                    linewidth=2)  
+                if log_y:
+                    plt.semilogy(X, Y[:,i],
+                        label= '{}'.format(labels[i]),
+                        linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
+                        linewidth=2)    
+                else:
+                    plt.plot(X, Y[:,i],
+                        label= '{}'.format(labels[i]),
+                        linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
+                        linewidth=2)  
 
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
         ax.xaxis.set_ticks_position('bottom')
         ax.yaxis.set_ticks_position('left')
 
+
         if tick_increment is not None:
             loc = mtick.MultipleLocator(base=tick_increment) # this locator puts ticks at regular intervals
             ax.yaxis.set_major_locator(loc)
-        
-        set_lims(X,Y,xmin,xmax,ymin,ymax,log_y,log_x)
+  
+
+        set_lims(ax,X,Y,xmin,xmax,ymin,ymax)
+      
 
         # Show the grid, if desired
         ax.grid(grid)
@@ -254,9 +255,6 @@ def generate_plot(
             plt.errorbar(positions,means,yerr=[maxes-means,means-mins],fmt='D', 
                          ecolor='C1',mfc='C1',mec='C1',capsize=5, capthick=1,lw=1,label='Experimental'
                         )
-
-        # Set the legend with the number of columns
-        ax.legend(ncol=num_col,loc=legend_loc,mode=None).get_frame().set_edgecolor('k')
 
     elif plot_type.lower() == 'scatter': 
         for i in range(0,len(labels)):
@@ -291,30 +289,32 @@ def generate_plot(
     else:
         raise ValueError('Invalid plot_type value. Please provide a valid plot type')
 
-    # X tick locations
-    xloc = mtick.MaxNLocator(
-                    nbins=7, # Maximum number of bins
-                    steps = [0.1, 0.25, .5 ,1 , 2, 2.5, 5, 10], # valid step increments
-                    prune='both').tick_values(*plt.xlim()) 
+    if not log_y:
+        # X tick locations
+        xloc = mtick.MaxNLocator(
+                        nbins=7, # Maximum number of bins
+                        steps = [1 , 2, 2.5, 5, 10], # valid step increments
+                        prune='both').tick_values(*plt.xlim()) 
 
-    # Y tick locations
-    yloc = mtick.MaxNLocator(
-                    nbins=6, # Maximum number of bins
-                    steps = [0.1, 0.25, .5, 1, 2, 2.5, 5, 10], # valid step increments
-                    prune='upper').tick_values(*plt.ylim())
+        # Y tick locations
+        yloc = mtick.MaxNLocator(
+                        nbins=6, # Maximum number of bins
+                        steps = [1, 2, 2.5, 5, 10], # valid step increments
+                        prune='upper').tick_values(*plt.ylim())
 
-    if hide_origin:
-        # Hide the origin
-        yloc = yloc[np.argwhere(yloc != 0.)]
-        xloc = xloc[np.argwhere(xloc != 0.)]
+        if hide_origin:
+            # Hide the origin
+            yloc = yloc[np.argwhere(yloc != 0.)]
+            xloc = xloc[np.argwhere(xloc != 0.)]
 
-    # Set the tickmarks at the given x and y locations
-    ax.set_xticks(xloc)
-    ax.set_yticks(yloc)
-
-    # Show the legend
-    ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
+        # Set the tickmarks at the given x and y locations
+        ax.set_xticks(xloc)
+        ax.set_yticks(yloc)
     
+    if labels[0]:
+        # Show the legend
+        ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
+        
     # Create the axis labels
     plt.xlabel('{}'.format(xlabel), labelpad=xlabelpad)
     plt.ylabel('{}'.format(ylabel), labelpad=5)
@@ -334,11 +334,11 @@ def generate_plot(
         if transparent:
             plt.savefig('{}.png'\
                     .format(filename),transparent=transparent)             
-        else if file_type == 'pdf':
+        elif file_type == 'pdf':
             plt.savefig('{}.pdf'\
                     .format(filename))    
-        else if file_type == 'svg':
-            plt.savefif('{}'.svg\
+        elif file_type == 'svg':
+            plt.savefig('{}.svg'\
                     .format(filename)) 
 
     if showplot:
@@ -362,7 +362,8 @@ def plot_3d(
     labelsize=24,
     labelpad=20,
     rotated=False,
-    transparent=False):
+    transparent=False,
+    file_type='pdf'):
     '''
     Plot data in three dimensions
 
@@ -399,7 +400,30 @@ def plot_3d(
 
     ax1.xaxis.set_major_locator(mtick.MultipleLocator(xticks))
     ax1.yaxis.set_major_locator(mtick.MultipleLocator(yticks))
-    
+
+    multipliers = {
+        r'$(\times 10^{9})$': 1e-9,
+        r'$(\times 10^{6})$': 1e-6,
+        r'$(\times 10^{3})$': 1e-3,
+        r'$(\times 10^{-3})$': 1e3,
+        r'$(\times 10^{-6})$': 1e6,
+        r'$(\times 10^{-9})$': 1e9,
+    }
+
+    if np.abs(np.amax(Z)) < 0.01 or np.abs(np.amin(Z)) > 1000:
+
+        thisKey = ''
+        thisValue = 1
+
+        for key,value in multipliers.items():
+            if (np.abs(np.amax(Z)) * value) // 1e3 < 1:
+                thisKey = key
+                thisValue = value
+
+        zlabel += ' ' + thisKey
+        Z *= thisValue
+
+
     # format the tick labels
     plt.setp(ax1.get_ymajorticklabels(), family='serif',fontsize=22)
     plt.setp(ax1.get_xmajorticklabels(), family='serif',fontsize=22)
@@ -483,6 +507,7 @@ def plot_3d(
     ax1.set_ylabel(ylabel,family='serif',fontsize=labelsize,labelpad=labelpad)
     ax1.set_zlabel(zlabel,family='serif',fontsize=labelsize,labelpad=15,rotation=90)
     
+
     if save_plot:
         if folder is not None:
             # Ensure that the folder we want to save to exists
@@ -495,9 +520,12 @@ def plot_3d(
         if transparent:
             plt.savefig('{}.png'\
                     .format(filename),transparent=transparent)             
-        else:
+        elif file_type == 'pdf':
             plt.savefig('{}.pdf'\
-                    .format(filename))     
+                    .format(filename))    
+        elif file_type == 'svg':
+            plt.savefig('{}.svg'\
+                    .format(filename))      
 
     if showplot:
         plt.show()

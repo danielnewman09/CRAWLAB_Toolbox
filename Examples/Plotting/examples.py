@@ -61,6 +61,9 @@ freq = data[:,0]
 phase = data[:,1]
 amp = data[:,2]
 
+import pdb
+pdb.set_trace()
+
 # Create a 3D plot
 plotting.plot_3d(freq,phase,amp,
 		r'$\frac{\omega_n}{\omega_m}$',
