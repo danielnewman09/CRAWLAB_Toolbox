@@ -36,9 +36,13 @@ def csd(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
         if Pxy.shape[-1] > 1:
             if average == 'median':
                 Pxy = np.median(Pxy, axis=-1) / _median_bias(Pxy.shape[-1])
+                Std = None
             elif average == 'mean':
                 Std = np.std(Pxy,ddof=1,axis=-1)
                 Pxy = Pxy.mean(axis=-1)
+            elif average == None:
+                Pxy = Pxy
+                Std = None
             else:
                 raise ValueError('average must be "median" or "mean", got %s'
                                  % (average,))
