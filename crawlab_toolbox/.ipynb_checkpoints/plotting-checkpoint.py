@@ -545,6 +545,26 @@ def plot_3d(
     plt.clf()
     plt.cla()
     plt.close()
+    
+def timedelta_helper(timeValues,timeUnit):
+    
+    timeValues = timeValues.flatten().tolist()
+    startTime = timeValues[0]
+    
+    if timeUnit.lower() == 'minutes':
+        timeDivisor = 60
+    elif timeUnit.lower() == 'hours':
+        timeDivisor = 60 * 60
+    elif timeUnit.lower() == 'days':
+        timeDivisor = 60 * 60 * 24
+    elif timeUnit.lower() == 'weeks':
+        timeDivisor = 60 * 60 * 24 * 7
+    
+    timeValues = [(timeValues[i] - startTime).total_seconds()/timeDivisor for i in range(len(timeValues))]
+    
+    timeValues = np.array(timeValues)
+    
+    return timeValues
 
 class MyFormatter(Formatter):
     def __init__(self, dates, fmt='%Y-%m-%d'):
@@ -672,7 +692,6 @@ def plot_timeseries(
     ax.xaxis.set_ticks_position('bottom')
     ax.yaxis.set_ticks_position('left')
 
-    
     fig.autofmt_xdate()
 
     if tick_increment is not None:
