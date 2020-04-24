@@ -45,7 +45,7 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
-mpl.rcParams['font.serif'] = 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
+mpl.rcParams['font.serif'] = 'DejaVu Serif', 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
 
 # TEXT
 mpl.rcParams['text.hinting_factor'] = 8 # Specifies the amount of softness for hinting in the
@@ -56,7 +56,7 @@ mpl.rcParams['text.latex.preview'] = True
 
 
 # AXES
-mpl.rcParams['axes.labelsize'] = 18  # fontsize of the x any y labels
+mpl.rcParams['axes.labelsize'] = 22  # fontsize of the x any y labels
 mpl.rcParams['axes.labelweight'] = 'medium'  # weight of the x and y labels
 mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'])
                       ## color cycle for plot lines  as list of string
@@ -66,6 +66,7 @@ mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4
 # TICKS
 mpl.rcParams['xtick.labelsize'] = 18      # fontsize of the tick labels
 mpl.rcParams['ytick.labelsize'] = 18      # fontsize of the tick labels
+
 
 # GRID
 mpl.rcParams['grid.color'] = '0.75'   # grid color
