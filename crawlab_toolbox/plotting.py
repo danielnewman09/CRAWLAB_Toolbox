@@ -45,14 +45,19 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
+<<<<<<< HEAD
 mpl.rcParams['font.serif'] = 'DejaVu Serif', 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
 
+=======
+mpl.rcParams['font.serif'] = 'DejaVu Serif'
+>>>>>>> 9bc5bd6d8cd84a4e1bf8e2b93bd65b0294a7d836
 # TEXT
 mpl.rcParams['text.hinting_factor'] = 8 # Specifies the amount of softness for hinting in the
                          # horizontal direction.  A value of 1 will hint to full
                          # pixels.  A value of 2 will hint to half pixels etc.
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preview'] = True
+mpl.rcParams['text.latex.preamble']=[r"\usepackage{amsmath} \boldmath"]
 
 
 # AXES
@@ -214,19 +219,19 @@ def generate_plot(
                 linewidth=1)
             elif 'sigma' in labels[i].lower():
                 plt.plot(X, Y[:,i],
-                label=labels[i],
+                label=r'\textbf{' + labels[i] + '}',
                 color='k',
                 linestyle=plot_linestyle[1], # Linestyle given from array at the beginning of this document
                 linewidth=2)
             else:
                 if log_y:
                     plt.semilogy(X, Y[:,i],
-                        label= '{}'.format(labels[i]),
+                        label=r'\textbf{' + labels[i] + '}',
                         linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                         linewidth=2)    
                 else:
                     plt.plot(X, Y[:,i],
-                        label= '{}'.format(labels[i]),
+                        label=r'\textbf{' + labels[i] + '}',
                         linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                         linewidth=2)  
 
@@ -329,8 +334,8 @@ def generate_plot(
         ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
         
     # Create the axis labels
-    plt.xlabel('{}'.format(xlabel), labelpad=xlabelpad)
-    plt.ylabel('{}'.format(ylabel), labelpad=5)
+    plt.xlabel(r'\textbf{' + xlabel + '}', labelpad=xlabelpad)
+    plt.ylabel(r'\textbf{' + ylabel + '}', labelpad=5)
 
     # Adjust the page layout filling the page using the new tight_layout command
     plt.tight_layout(pad=1.2) 
@@ -546,11 +551,31 @@ def plot_3d(
     plt.clf()
     plt.cla()
     plt.close()
+    
+def timedelta_helper(timeValues,timeUnit):
+    
+    timeValues = timeValues.flatten().tolist()
+    startTime = timeValues[0]
+    
+    if timeUnit.lower() == 'minutes':
+        timeDivisor = 60
+    elif timeUnit.lower() == 'hours':
+        timeDivisor = 60 * 60
+    elif timeUnit.lower() == 'days':
+        timeDivisor = 60 * 60 * 24
+    elif timeUnit.lower() == 'weeks':
+        timeDivisor = 60 * 60 * 24 * 7
+    
+    timeValues = [(timeValues[i] - startTime).total_seconds()/timeDivisor for i in range(len(timeValues))]
+    
+    timeValues = np.array(timeValues)
+    
+    return timeValues
 
 class MyFormatter(Formatter):
     def __init__(self, dates, fmt='%Y-%m-%d'):
         self.dates = dates
-        self.fmt = fmt
+        self.fmt = r'\textbf{' + fmt + '}'
 
     def __call__(self, x, pos=0):
         'Return the label for time x at position pos'
@@ -558,8 +583,7 @@ class MyFormatter(Formatter):
         if ind >= len(self.dates) or ind < 0:
             return ''
         return self.dates[ind].strftime(self.fmt)
-
-def plot_timeseries()
+def plot_timeseries(
                 time,Y,labels,xlabel,ylabel,
                 plot_type = 'Plot',
                 ymax = 0.1, 
@@ -627,6 +651,7 @@ def plot_timeseries()
 
     # Customize the axes
     ax = plt.gca()
+    fig = plt.gcf()
     
     # Make sure the Y data is at least 2-D
     Y = np.atleast_2d(Y)
@@ -644,25 +669,27 @@ def plot_timeseries()
     if Y.shape[1] != len(labels):
         raise ValueError('Please ensure the number of legend labels matches the number of data plots.')
   
+    ax.xaxis.set_major_formatter(formatter)
+
     # Plot all of the available data
     for i in np.arange(0,len(labels)):
 
         if 'sigma' in labels[i].lower():
             control_chart = True
-            plt.plot(time, Y[:,i],
-            label=labels[i],
+            plt.plot(np.arange(Y.shape[0]), Y[:,i],
+            label=r'\textbf{' + labels[i] + '}',
             color='k',
             linestyle=plot_linestyle[1], # Linestyle given from array at the beginning of this document
             linewidth=2)
         else:
             if log_y:
-                plt.semilogy(time, Y[:,i],
-                    label= '{}'.format(labels[i]),
+                plt.semilogy(np.arange(Y.shape[0]), Y[:,i],
+                    label=r'\textbf{' + labels[i] + '}',
                     linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                     linewidth=2)    
             else:
-                plt.plot(time, Y[:,i],
-                    label= '{}'.format(labels[i]),
+                plt.plot(np.arange(Y.shape[0]), Y[:,i],
+                    label=r'\textbf{' + labels[i] + '}',
                     linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                     linewidth=2)  
 
@@ -671,21 +698,24 @@ def plot_timeseries()
     ax.xaxis.set_ticks_position('bottom')
     ax.yaxis.set_ticks_position('left')
 
-    ax.xaxis.set_major_formatter(formatter)
     fig.autofmt_xdate()
 
     if tick_increment is not None:
         loc = mtick.MultipleLocator(base=tick_increment) # this locator puts ticks at regular intervals
         ax.yaxis.set_major_locator(loc)
 
-
-    set_lims(ax,X,Y,xmin,xmax,ymin,ymax)
-    
+    if not isinstance(ymax,np.ndarray):
+        # Set the window limits
+        plt.ylim(np.amin(Y) - ymin * abs(np.amin(Y)),
+                 np.amax(Y) + ymax * abs(np.amax(Y)-np.amin(Y)))
+    else:
+        plt.ylim(ymin[0],ymax[0])
 
     # Show the grid, if desired
     ax.grid(grid)
 
     ax.set_axisbelow(True)
+    
 
 
     if not log_y:
@@ -710,8 +740,8 @@ def plot_timeseries()
         ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
         
     # Create the axis labels
-    plt.xlabel('{}'.format(xlabel), labelpad=xlabelpad)
-    plt.ylabel('{}'.format(ylabel), labelpad=5)
+    plt.xlabel(r'\textbf{' + xlabel + '}', labelpad=xlabelpad)
+    plt.ylabel(r'\textbf{' + ylabel + '}', labelpad=5)
 
     # Adjust the page layout filling the page using the new tight_layout command
     plt.tight_layout(pad=1.2) 
@@ -742,11 +772,11 @@ def plot_timeseries()
     plt.clf()
     plt.cla()
     plt.close()
-
+    
 def plot_spectrogram(
             time,
             spectrogram,
-            frequencyInterval
+            frequencyInterval,
             size=(12,4),
             showplot = False,
             save_plot = False,
@@ -766,15 +796,16 @@ def plot_spectrogram(
 
     # Customize the axes
     ax = plt.gca()
-    plt.pcolormesh(X,Y,sensor_FFT,cmap='bwr')
+    plt.pcolormesh(X,Y,spectrogram,cmap='bwr')
 
-    formatter = MyFormatter(sensor_dateTime,fmt=date_format)
+    formatter = MyFormatter(time,fmt=date_format)
     ax.yaxis.set_major_formatter(formatter)
+    ax.tick_params(labelsize=18)
 
     plt.colorbar()
 
-    plt.xlabel('Frequency (Hz)', labelpad=xlabelpad)
-    plt.ylabel('Time', labelpad=ylabelpad)
+    plt.xlabel(r'\textbf{Frequency (Hz)}', labelpad=xlabelpad,fontsize=22)
+    plt.ylabel(r'\textbf{Time}', labelpad=ylabelpad,fontsize=22)
 
     plt.tight_layout(pad=1.2)
 

@@ -15,22 +15,24 @@
 
 
 import matplotlib as mpl
-
 from matplotlib import pyplot as plt
 from matplotlib import ticker as mtick
-
 from matplotlib import rc
 from matplotlib import cm
-
 from mpl_toolkits.mplot3d import Axes3D
-
 import numpy as np
-
 import os
-
 from scipy.interpolate import griddata
-
 from cycler import cycler
+
+from pandas.plotting import register_matplotlib_converters
+import datetime
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
+from matplotlib.ticker import Formatter
+import matplotlib.dates as mdates
+
+
 
 ### MATPLOTLIBRC FORMAT
 #mpl.rcParams['backend'] = 'MacOSX'
@@ -43,18 +45,18 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
-mpl.rcParams['font.serif'] = 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
-
+mpl.rcParams['font.serif'] = 'DejaVu Serif'
 # TEXT
 mpl.rcParams['text.hinting_factor'] = 8 # Specifies the amount of softness for hinting in the
                          # horizontal direction.  A value of 1 will hint to full
                          # pixels.  A value of 2 will hint to half pixels etc.
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preview'] = True
+mpl.rcParams['text.latex.preamble']=[r"\usepackage{amsmath} \boldmath"]
 
 
 # AXES
-mpl.rcParams['axes.labelsize'] = 18  # fontsize of the x any y labels
+mpl.rcParams['axes.labelsize'] = 22  # fontsize of the x any y labels
 mpl.rcParams['axes.labelweight'] = 'medium'  # weight of the x and y labels
 mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'])
                       ## color cycle for plot lines  as list of string
@@ -211,19 +213,19 @@ def generate_plot(
                 linewidth=1)
             elif 'sigma' in labels[i].lower():
                 plt.plot(X, Y[:,i],
-                label=labels[i],
+                label=r'\textbf{' + labels[i] + '}',
                 color='k',
                 linestyle=plot_linestyle[1], # Linestyle given from array at the beginning of this document
                 linewidth=2)
             else:
                 if log_y:
                     plt.semilogy(X, Y[:,i],
-                        label= '{}'.format(labels[i]),
+                        label=r'\textbf{' + labels[i] + '}',
                         linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                         linewidth=2)    
                 else:
                     plt.plot(X, Y[:,i],
-                        label= '{}'.format(labels[i]),
+                        label=r'\textbf{' + labels[i] + '}',
                         linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
                         linewidth=2)  
 
@@ -295,7 +297,7 @@ def generate_plot(
         # turn off the top spine/ticks
         ax.spines['top'].set_color('none')
         ax.xaxis.tick_bottom()
-        
+            
     else:
         raise ValueError('Invalid plot_type value. Please provide a valid plot type')
 
@@ -326,8 +328,8 @@ def generate_plot(
         ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
         
     # Create the axis labels
-    plt.xlabel('{}'.format(xlabel), labelpad=xlabelpad)
-    plt.ylabel('{}'.format(ylabel), labelpad=5)
+    plt.xlabel(r'\textbf{' + xlabel + '}', labelpad=xlabelpad)
+    plt.ylabel(r'\textbf{' + ylabel + '}', labelpad=5)
 
     # Adjust the page layout filling the page using the new tight_layout command
     plt.tight_layout(pad=1.2) 
@@ -540,6 +542,290 @@ def plot_3d(
     if showplot:
         plt.show()
 
+    plt.clf()
+    plt.cla()
+    plt.close()
+    
+def timedelta_helper(timeValues,timeUnit):
+    
+    timeValues = timeValues.flatten().tolist()
+    startTime = timeValues[0]
+    
+    if timeUnit.lower() == 'minutes':
+        timeDivisor = 60
+    elif timeUnit.lower() == 'hours':
+        timeDivisor = 60 * 60
+    elif timeUnit.lower() == 'days':
+        timeDivisor = 60 * 60 * 24
+    elif timeUnit.lower() == 'weeks':
+        timeDivisor = 60 * 60 * 24 * 7
+    
+    timeValues = [(timeValues[i] - startTime).total_seconds()/timeDivisor for i in range(len(timeValues))]
+    
+    timeValues = np.array(timeValues)
+    
+    return timeValues
+
+class MyFormatter(Formatter):
+    def __init__(self, dates, fmt='%Y-%m-%d'):
+        self.dates = dates
+        self.fmt = r'\textbf{' + fmt + '}'
+
+    def __call__(self, x, pos=0):
+        'Return the label for time x at position pos'
+        ind = int(np.round(x))
+        if ind >= len(self.dates) or ind < 0:
+            return ''
+        return self.dates[ind].strftime(self.fmt)
+def plot_timeseries(
+                time,Y,labels,xlabel,ylabel,
+                plot_type = 'Plot',
+                ymax = 0.1, 
+                ymin = 0.1,
+                xmax = None,
+                xmin = None,
+                tick_increment = None,
+                showplot = False,
+                save_plot = False,
+                log_y = False,
+                log_x = False,
+                transparent = False,
+                grid = False, 
+                folder = None,
+                filename = 'Plot',
+                num_col = 2,
+                legend_loc = 'upper right',
+                experimental_args = None,
+                xlabelpad = 5,       
+                hide_origin = False,  
+                template='publication',
+                file_type='pdf',
+                date_format='%Y-%m-%d'
+                 ):    
+    '''
+    This is a function which accepts a series of data and plots it based on preset defaults
+    as well as user-defined, custom inputs.
+    
+    Creator : Daniel Newman - Danielnewman09@gmail.com
+    
+    Mandatory Inputs:
+        X - x-coordinate of the plot
+        Y - y-coordinates of the plot. Must have an axis of the same length as X
+        labels - list of strings which form the labels we will use for the legend
+        xlabel - Label along the X-axis
+        ylabel - Label along the Y-axis
+    
+    Optional Inputs:
+        plot_type - String indicating the type of plot
+        ymax - multiplicative value for the maximum Y value
+        ymin - multiplicative value for the minimum Y value
+        xmax - maximum X value
+        xmin - minimum X value
+        tick_increment - spacing between y-axis ticks
+        showplot - boolean indicating whether the plot is displayed
+        log_y - boolean indicating whether the y-axis should be on a log scale
+        transparent - boolean indicating whether to save a transparent .png
+        grid - boolean indicating whether to show the grid
+        folder - subfolder in which to save the figure
+        filename - string indicating the name of the saved file
+        num_col - number of columns in the legend
+        legend_loc - string indicating the location of the legend
+        experimental_args - experimental values to show on the plot
+        xlabelpad - spacing between the x-axis and the x-label
+    '''
+
+    formatter = MyFormatter(time,fmt=date_format)
+
+    if template.lower() == 'large':
+        plt.figure(figsize=(10,6.67))
+    elif template.lower() == 'wide':
+        plt.figure(figsize=(12,4))
+    else:
+        plt.figure(figsize=(6,4))
+
+    # Customize the axes
+    ax = plt.gca()
+    fig = plt.gcf()
+    
+    # Make sure the Y data is at least 2-D
+    Y = np.atleast_2d(Y)
+    
+    # Ensure the compatibility of the X and Y data
+    if Y.shape[0] != time.shape[0] and Y.shape[1] != time.shape[0]:
+        raise ValueError(
+            '''The Shape of X, [{}], is not compatible 
+             with the shape of Y, [{}]...\n Exiting'''
+            .format(time.shape,Y.shape))
+        return 
+    elif Y.shape[0] != time.shape[0]: 
+        Y = Y.T
+
+    if Y.shape[1] != len(labels):
+        raise ValueError('Please ensure the number of legend labels matches the number of data plots.')
+  
+    ax.xaxis.set_major_formatter(formatter)
+
+    # Plot all of the available data
+    for i in np.arange(0,len(labels)):
+
+        if 'sigma' in labels[i].lower():
+            control_chart = True
+            plt.plot(np.arange(Y.shape[0]), Y[:,i],
+            label=r'\textbf{' + labels[i] + '}',
+            color='k',
+            linestyle=plot_linestyle[1], # Linestyle given from array at the beginning of this document
+            linewidth=2)
+        else:
+            if log_y:
+                plt.semilogy(np.arange(Y.shape[0]), Y[:,i],
+                    label=r'\textbf{' + labels[i] + '}',
+                    linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
+                    linewidth=2)    
+            else:
+                plt.plot(np.arange(Y.shape[0]), Y[:,i],
+                    label=r'\textbf{' + labels[i] + '}',
+                    linestyle=plot_linestyle[i], # Linestyle given from array at the beginning of this document
+                    linewidth=2)  
+
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    fig.autofmt_xdate()
+
+    if tick_increment is not None:
+        loc = mtick.MultipleLocator(base=tick_increment) # this locator puts ticks at regular intervals
+        ax.yaxis.set_major_locator(loc)
+
+    if not isinstance(ymax,np.ndarray):
+        # Set the window limits
+        plt.ylim(np.amin(Y) - ymin * abs(np.amin(Y)),
+                 np.amax(Y) + ymax * abs(np.amax(Y)-np.amin(Y)))
+    else:
+        plt.ylim(ymin[0],ymax[0])
+
+    # Show the grid, if desired
+    ax.grid(grid)
+
+    ax.set_axisbelow(True)
+    
+
+
+    if not log_y:
+        # X tick locations
+        xloc = mtick.MaxNLocator(
+                        nbins=7, # Maximum number of bins
+                        steps = [1 , 2, 2.5, 5, 10], # valid step increments
+                        prune='both').tick_values(*plt.xlim()) 
+
+        # Y tick locations
+        yloc = mtick.MaxNLocator(
+                        nbins=6, # Maximum number of bins
+                        steps = [1, 2, 2.5, 5, 10], # valid step increments
+                        prune='upper').tick_values(*plt.ylim())
+
+        # Set the tickmarks at the given x and y locations
+        ax.set_xticks(xloc)
+        ax.set_yticks(yloc)
+    
+    if labels[0]:
+        # Show the legend
+        ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
+        
+    # Create the axis labels
+    plt.xlabel(r'\textbf{' + xlabel + '}', labelpad=xlabelpad)
+    plt.ylabel(r'\textbf{' + ylabel + '}', labelpad=5)
+
+    # Adjust the page layout filling the page using the new tight_layout command
+    plt.tight_layout(pad=1.2) 
+
+    if save_plot:
+        if folder is not None:
+            # Ensure that the folder we want to save to exists
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
+            filename = folder + '/' + filename
+
+        # Save the pdf of the plot    
+        if file_type == 'png':
+            plt.savefig('{}.png'\
+                    .format(filename),transparent=transparent)             
+        elif file_type == 'pdf':
+            plt.savefig('{}.pdf'\
+                    .format(filename))    
+        elif file_type == 'svg':
+            plt.savefig('{}.svg'\
+                    .format(filename)) 
+
+    if showplot:
+        plt.show()
+
+    # Clear the axes and figure
+    plt.clf()
+    plt.cla()
+    plt.close()
+    
+def plot_spectrogram(
+            time,
+            spectrogram,
+            frequencyInterval,
+            size=(12,4),
+            showplot = False,
+            save_plot = False,
+            transparent = False,
+            folder = None,
+            filename = 'Spectrogram',
+            xlabelpad = 5,    
+            ylabelpad = 5,   
+            file_type='pdf',
+            date_format='%I:00 %p, %b %d'
+            ):
+
+    xi = np.arange(-0.0, spectrogram.shape[1] * frequencyInterval,frequencyInterval)
+    yi = np.arange(0.0,spectrogram.shape[0])
+    X, Y = np.meshgrid(xi, yi)
+    plt.figure(figsize=size)
+
+    # Customize the axes
+    ax = plt.gca()
+    plt.pcolormesh(X,Y,spectrogram,cmap='bwr')
+
+    formatter = MyFormatter(time,fmt=date_format)
+    ax.yaxis.set_major_formatter(formatter)
+    ax.tick_params(labelsize=18)
+
+    plt.colorbar()
+
+    plt.xlabel(r'\textbf{Frequency (Hz)}', labelpad=xlabelpad,fontsize=22)
+    plt.ylabel(r'\textbf{Time}', labelpad=ylabelpad,fontsize=22)
+
+    plt.tight_layout(pad=1.2)
+
+    if save_plot:
+        if folder is not None:
+            # Ensure that the folder we want to save to exists
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
+            filename = folder + '/' + filename
+
+        # Save the pdf of the plot    
+        if file_type == 'png':
+            plt.savefig('{}.png'\
+                    .format(filename),transparent=transparent)             
+        elif file_type == 'pdf':
+            plt.savefig('{}.pdf'\
+                    .format(filename))    
+        elif file_type == 'svg':
+            plt.savefig('{}.svg'\
+                    .format(filename)) 
+
+    if showplot:
+        plt.show()
+
+    # Clear the axes and figure
     plt.clf()
     plt.cla()
     plt.close()
