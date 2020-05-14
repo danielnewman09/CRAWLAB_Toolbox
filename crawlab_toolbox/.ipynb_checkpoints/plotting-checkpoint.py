@@ -32,7 +32,7 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
 from matplotlib.ticker import Formatter
 import matplotlib.dates as mdates
 
-
+import matplotlib.colors as colors
 
 ### MATPLOTLIBRC FORMAT
 #mpl.rcParams['backend'] = 'MacOSX'
@@ -783,23 +783,23 @@ def plot_spectrogram(
             date_format='%I:00 %p, %b %d'
             ):
 
-    xi = np.arange(-0.0, spectrogram.shape[1] * frequencyInterval,frequencyInterval)
-    yi = np.arange(0.0,spectrogram.shape[0])
+    yi = np.arange(-0.0, spectrogram.shape[1] * frequencyInterval,frequencyInterval)
+    xi = np.arange(0.0,spectrogram.shape[0])
     X, Y = np.meshgrid(xi, yi)
     plt.figure(figsize=size)
 
     # Customize the axes
     ax = plt.gca()
-    plt.pcolormesh(X,Y,spectrogram,cmap='bwr')
+    plt.pcolormesh(X,Y,spectrogram,cmap='cividis',norm=colors.LogNorm(vmin=np.amin(spectrogram),vmax=np.amax(spectrogram)))
 
     formatter = MyFormatter(time,fmt=date_format)
-    ax.yaxis.set_major_formatter(formatter)
+    ax.xaxis.set_major_formatter(formatter)
     ax.tick_params(labelsize=18)
 
     plt.colorbar()
 
-    plt.xlabel(r'\textbf{Frequency (Hz)}', labelpad=xlabelpad,fontsize=22)
-    plt.ylabel(r'\textbf{Time}', labelpad=ylabelpad,fontsize=22)
+    plt.ylabel(r'\textbf{Frequency (Hz)}', labelpad=ylabelpad,fontsize=22)
+    plt.xlabel(r'\textbf{Time}', labelpad=xlabelpad,fontsize=22)
 
     plt.tight_layout(pad=1.2)
 
@@ -829,3 +829,92 @@ def plot_spectrogram(
     plt.clf()
     plt.cla()
     plt.close()
+    
+def plot_normaltest(data,xlabel,ylabel,filename,folder='figures',transparent=True,file_type='png'):
+    
+    from scipy.stats import probplot
+    
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    res = probplot(data, plot=ax)
+    ax.set_title("")
+    plt.xlabel(r'\textbf{' + xlabel + '}')
+    plt.ylabel(r'\textbf{' + ylabel + '}')
+    filename = folder + '/' + filename
+    
+    # Save the pdf of the plot    
+    if file_type == 'png':
+        plt.savefig('{}.png'\
+                .format(filename),transparent=transparent)             
+    elif file_type == 'pdf':
+        plt.savefig('{}.pdf'\
+                .format(filename))    
+    elif file_type == 'svg':
+        plt.savefig('{}.svg'\
+                .format(filename)) 
+ 
+    plt.show()
+
+def plot_histogram(data,labels,xlabel,ylabel,filename,template='publication',ymax=0,
+                   folder='figures',transparent=True,file_type='png',num_col = 2,legend_loc='best',nbins=20):
+    
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    
+    if template.lower() == 'publication':
+        plt.figure(figsize=(6,4))
+    else:
+        plt.figure(figsize=(12,4))
+        
+    data = np.atleast_2d(data)
+    
+    if data.shape[0] > data.shape[1]:
+        data = data.T
+    
+    colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628']
+    
+    ax = plt.gca()
+    
+    max_y = 0.
+    
+    # the histogram of the data
+    for i in range(data.shape[0]):
+        n, bins, patches = plt.hist(data[i,:], nbins, density=True, facecolor=colors[i], alpha=0.90,label=labels[i])
+        
+        if np.amax(n) > max_y:
+            max_y = np.amax(n)
+
+    ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    
+    plt.ylim(0,max_y + ymax)
+
+    plt.xlabel(r'\textbf{' + xlabel + '}')
+    plt.ylabel(r'\textbf{' + ylabel + '}')
+    plt.grid(False)
+    
+    filename = folder + '/' + filename
+    
+    # Save the pdf of the plot    
+    if file_type == 'png':
+        plt.savefig('{}.png'\
+                .format(filename),transparent=transparent)             
+    elif file_type == 'pdf':
+        plt.savefig('{}.pdf'\
+                .format(filename))    
+    elif file_type == 'svg':
+        plt.savefig('{}.svg'\
+                .format(filename)) 
+  
+    plt.show()
