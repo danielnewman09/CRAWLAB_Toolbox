@@ -45,7 +45,12 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
+<<<<<<< HEAD
+mpl.rcParams['font.serif'] = 'DejaVu Serif', 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
+
+=======
 mpl.rcParams['font.serif'] = 'DejaVu Serif'
+>>>>>>> 9bc5bd6d8cd84a4e1bf8e2b93bd65b0294a7d836
 # TEXT
 mpl.rcParams['text.hinting_factor'] = 8 # Specifies the amount of softness for hinting in the
                          # horizontal direction.  A value of 1 will hint to full
@@ -66,6 +71,7 @@ mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4
 # TICKS
 mpl.rcParams['xtick.labelsize'] = 18      # fontsize of the tick labels
 mpl.rcParams['ytick.labelsize'] = 18      # fontsize of the tick labels
+
 
 # GRID
 mpl.rcParams['grid.color'] = '0.75'   # grid color
