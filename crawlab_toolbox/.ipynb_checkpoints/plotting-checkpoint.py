@@ -45,7 +45,8 @@ mpl.rcParams['lines.dash_capstyle'] = 'round'          # butt|round|projecting
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.weight'] = 'normal'
 #font.size           : 12.0
-mpl.rcParams['font.serif'] = 'DejaVu Serif'
+mpl.rcParams['font.serif'] = 'DejaVu Serif', 'CMU Serif', 'Bitstream Vera Serif', 'New Century Schoolbook', 'Century Schoolbook L', 'Utopia', 'ITC Bookman', 'Bookman', 'Nimbus Roman No9 L', 'Times New Roman', 'Times', 'Palatino', 'Charter', 'serif'
+
 # TEXT
 mpl.rcParams['text.hinting_factor'] = 8 # Specifies the amount of softness for hinting in the
                          # horizontal direction.  A value of 1 will hint to full
@@ -66,6 +67,7 @@ mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#e41a1c', '#377eb8', '#4daf4
 # TICKS
 mpl.rcParams['xtick.labelsize'] = 18      # fontsize of the tick labels
 mpl.rcParams['ytick.labelsize'] = 18      # fontsize of the tick labels
+
 
 # GRID
 mpl.rcParams['grid.color'] = '0.75'   # grid color
@@ -569,7 +571,8 @@ def timedelta_helper(timeValues,timeUnit):
 class MyFormatter(Formatter):
     def __init__(self, dates, fmt='%Y-%m-%d'):
         self.dates = dates
-        self.fmt = r'\textbf{' + fmt + '}'
+        self.fmt = fmt
+#         self.fmt = r'\textbf{' + fmt + '}'
 
     def __call__(self, x, pos=0):
         'Return the label for time x at position pos'
@@ -734,8 +737,8 @@ def plot_timeseries(
         ax.legend(ncol=num_col,loc=legend_loc,framealpha=float(not transparent)).get_frame().set_edgecolor('k')
         
     # Create the axis labels
-    plt.xlabel(r'\textbf{' + xlabel + '}', labelpad=xlabelpad)
-    plt.ylabel(r'\textbf{' + ylabel + '}', labelpad=5)
+    plt.xlabel(xlabel, labelpad=xlabelpad)
+    plt.ylabel(ylabel, labelpad=5)
 
     # Adjust the page layout filling the page using the new tight_layout command
     plt.tight_layout(pad=1.2) 
@@ -874,11 +877,6 @@ def plot_histogram(data,labels,xlabel,ylabel,filename,template='publication',yma
     else:
         plt.figure(figsize=(12,4))
         
-    data = np.atleast_2d(data)
-    
-    if data.shape[0] > data.shape[1]:
-        data = data.T
-    
     colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628']
     
     ax = plt.gca()
@@ -886,8 +884,9 @@ def plot_histogram(data,labels,xlabel,ylabel,filename,template='publication',yma
     max_y = 0.
     
     # the histogram of the data
-    for i in range(data.shape[0]):
-        n, bins, patches = plt.hist(data[i,:], nbins, density=True, facecolor=colors[i], alpha=0.90,label=labels[i])
+    for i in range(len(data)):
+        
+        n, bins, patches = plt.hist(data[i], nbins, density=True, facecolor=colors[i], alpha=0.90,label=labels[i])
         
         if np.amax(n) > max_y:
             max_y = np.amax(n)
